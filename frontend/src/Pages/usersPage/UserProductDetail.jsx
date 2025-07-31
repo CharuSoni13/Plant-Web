@@ -13,7 +13,7 @@ const UserProductDetail = () => {
 
   const getProductDetail = async () => {
     try {
-      const res = await axios.get(`http://localhost:3000/products/${productId}`);
+      const res = await axios.get(`https://plant-web-backend.onrender.com/products/${productId}`);
       const productData = res.data.product || res.data;
       setProduct(productData);
       setLoading(false);

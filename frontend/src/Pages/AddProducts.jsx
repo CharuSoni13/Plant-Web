@@ -16,7 +16,7 @@ const AddProducts = () => {
     e.preventDefault();
     let formData = new FormData(e.target);
     axios
-      .post('http://localhost:3000/products/add', formData)
+      .post('https://plant-web-backend.onrender.com/products/add', formData)
       .then((res) => {
         console.log(res);
         navigate('/admin');

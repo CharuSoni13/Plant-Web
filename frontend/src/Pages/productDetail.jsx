@@ -9,14 +9,14 @@ const ProductDetail = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/products/${productId}`)
+      .get(`https://plant-web-backend.onrender.com/products/${productId}`)
       .then((res) => setProduct(res.data.product))
       .catch((err) => console.error(err));
   }, [productId]);
 
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      await axios.get(`http://localhost:3000/products/delete/${productId}`);
+      await axios.get(`https://plant-web-backend.onrender.com/products/delete/${productId}`);
       navigate("/admin");
     }
   };

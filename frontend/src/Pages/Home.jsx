@@ -12,7 +12,7 @@ const Home = () => {
 
   const getData = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/");
+      const res = await axios.get("https://plant-web-backend.onrender.com/");
       setProductData(res.data.products);
     } catch (err) {
       console.error("Error fetching products:", err);

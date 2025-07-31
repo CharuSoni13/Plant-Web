@@ -15,7 +15,7 @@ const UpdateProduct = () => {
   const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/products/${productId}`)
+    axios.get(`https://plant-web-backend.onrender.com/products/${productId}`)
       .then(res => {
         const prod = res.data.product;
         setProduct(prod);
@@ -39,7 +39,7 @@ const UpdateProduct = () => {
     }
 
     try {
-      await axios.post(`http://localhost:3000/products/update/${productId}`, formData);
+      await axios.post(`https://plant-web-backend.onrender.com/products/update/${productId}`, formData);
       alert('Product updated successfully!');
       navigate('/admin');
     } catch (err) {
