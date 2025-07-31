@@ -12,7 +12,7 @@ require("dotenv").config()
 app.use(morgon("dev"))
 
 
-app.use(cors({origin : ""}
+app.use(cors({origin : "https://plant-web-frontend.onrender.com"}
     
 ))
 
