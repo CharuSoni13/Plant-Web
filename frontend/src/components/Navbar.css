@@ -1,0 +1,76 @@
+.navbar {
+  background-color: #f0fdf4;
+  box-shadow: 0 2px 10px rgba(0, 128, 0, 0.1);
+  padding: 0.8rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-left .navbar-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #065f46;
+}
+
+.navbar-logo .ri-leaf-line {
+  font-size: 1.8rem;
+  margin-right: 0.4rem;
+  color: #22c55e;
+}
+
+.brand {
+  font-weight: 700;
+}
+
+.highlight {
+  color: #22c55e;
+}
+
+.navbar-search {
+  position: relative;
+  flex-grow: 1;
+  margin: 0 2rem;
+  max-width: 400px;
+}
+
+.navbar-search input {
+  width: 100%;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+  border: 1px solid #d1fae5;
+  border-radius: 20px;
+  outline: none;
+  font-size: 1rem;
+}
+
+.search-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #22c55e;
+}
+
+.navbar-btn {
+  background-color: #22c55e;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.navbar-btn:hover {
+  background-color: #16a34a;
+}
