@@ -6,37 +6,73 @@ import 'remixicon/fonts/remixicon.css';
 
 const AddProducts = () => {
   const navigate = useNavigate();
-  const [title, settitle] = useState('');
-  const [image, setimage] = useState('');
-  const [description, setdescription] = useState('');
-  const [category, setcategory] = useState('');
-  const [price, setprice] = useState('');
 
-  const handleSubmit = (e) => {
+  const [title, setTitle] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
+  const [price, setPrice] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let formData = new FormData(e.target);
-    axios
-      .post('https://plant-web-backend.onrender.com/products/add', formData)
-      .then((res) => {
-        console.log(res);
-        navigate('/admin');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
+    if (!imageFile) {
+      setError('Please select an image.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('image', imageFile); // must match backend multer field name
+      formData.append('description', description);
+      formData.append('category', category);
+      formData.append('price', price);
+
+      // If your backend requires any auth headers, include them here.
+      const res = await axios.post(
+        'https://plant-web-backend.onrender.com/products/add',
+        formData,
+        {
+          headers: {
+            // axios will normally set the proper multipart/form-data boundary automatically,
+            // but you can include this if your backend expects it explicitly.
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      console.log('Add product response:', res.data);
+      navigate('/admin');
+    } catch (err) {
+      console.error('Error submitting product:', err);
+      setError(
+        err.response?.data?.message ||
+          'Failed to add product. Check console / network and backend logs.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="formContainer">
-      <h2><i className="ri-plant-line"></i> Add New Product</h2>
-      <form onSubmit={handleSubmit} className="productForm">
+      <h2>
+        <i className="ri-plant-line"></i> Add New Product
+      </h2>
+      <form onSubmit={handleSubmit} className="productForm" encType="multipart/form-data">
         <div className="formGroup">
           <label htmlFor="title">Title</label>
           <input
             type="text"
             placeholder="Enter product title"
             value={title}
-            onChange={(e) => settitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
             name="title"
             id="title"
             required
@@ -50,7 +86,7 @@ const AddProducts = () => {
             name="image"
             id="image"
             accept="image/*"
-            onChange={(e) => setimage(e.target.files[0])}
+            onChange={(e) => setImageFile(e.target.files[0])}
             required
           />
         </div>
@@ -63,7 +99,7 @@ const AddProducts = () => {
             id="description"
             rows="3"
             value={description}
-            onChange={(e) => setdescription(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
             required
           ></textarea>
         </div>
@@ -76,7 +112,7 @@ const AddProducts = () => {
             name="category"
             id="category"
             value={category}
-            onChange={(e) => setcategory(e.target.value)}
+            onChange={(e) => setCategory(e.target.value)}
             required
           />
         </div>
@@ -89,13 +125,25 @@ const AddProducts = () => {
             name="price"
             id="price"
             value={price}
-            onChange={(e) => setprice(e.target.value)}
+            onChange={(e) => setPrice(e.target.value)}
             required
+            min="0"
+            step="0.01"
           />
         </div>
 
-        <button type="submit" className="submitBtn">
-          <i className="ri-upload-cloud-2-line"></i> Submit Product
+        {error && <div className="errorMsg">{error}</div>}
+
+        <button type="submit" className="submitBtn" disabled={loading}>
+          {loading ? (
+            <>
+              <i className="ri-loader-4-line ri-spin"></i> Submitting...
+            </>
+          ) : (
+            <>
+              <i className="ri-upload-cloud-2-line"></i> Submit Product
+            </>
+          )}
         </button>
       </form>
     </div>
@@ -103,6 +151,3 @@ const AddProducts = () => {
 };
 
 export default AddProducts;
-
-
-
