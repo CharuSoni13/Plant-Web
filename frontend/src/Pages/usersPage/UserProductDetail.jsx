@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { API_ENDPOINTS } from "../../config/api";
+import toast from "react-hot-toast";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const UserProductDetail = () => {
   const { productId } = useParams();
@@ -9,16 +13,17 @@ const UserProductDetail = () => {
 
   useEffect(() => {
     getProductDetail();
-  }, []);
+  }, [productId]);
 
   const getProductDetail = async () => {
     try {
-      const res = await axios.get(`https://plant-web-backend.onrender.com/products/${productId}`);
+      setLoading(true);
+      const res = await axios.get(`${API_ENDPOINTS.PRODUCTS}/${productId}`);
       const productData = res.data.product || res.data;
       setProduct(productData);
-      setLoading(false);
     } catch (err) {
       console.error("Failed to fetch product:", err);
+    } finally {
       setLoading(false);
     }
   };
@@ -27,15 +32,48 @@ const UserProductDetail = () => {
     const existingCart = JSON.parse(localStorage.getItem("cartItems")) || [];
     existingCart.push(product);
     localStorage.setItem("cartItems", JSON.stringify(existingCart));
-    alert(`"${product.title}" added to cart! 🛒`);
+    toast.success(`"${product.title}" added to cart! 🛒`);
   };
 
   const handleBuyNow = () => {
-    alert(`Proceeding to buy "${product.title}" 💸`);
+    toast.success(`Proceeding to buy "${product.title}" 💸`);
   };
 
-  if (loading) return <h2 className="text-center text-xl py-10">Loading...</h2>;
-  if (!product) return <h2 className="text-center text-xl py-10 text-red-500">Product not found.</h2>;
+  // Loading skeleton component
+  const LoadingSkeleton = () => (
+    <div className="min-h-screen bg-green-50 py-12 px-4 md:px-20">
+      <div className="bg-white rounded-lg shadow-lg p-8 md:flex gap-10">
+        <div className="md:w-1/2 mb-6 md:mb-0 flex justify-center items-center">
+          <Skeleton height={320} width={400} />
+        </div>
+        <div className="md:w-1/2">
+          <Skeleton height={48} width="80%" className="mb-4" />
+          <Skeleton height={16} count={4} className="mb-4" />
+          <Skeleton height={20} width="60%" className="mb-2" />
+          <Skeleton height={32} width="40%" className="mb-6" />
+          <div className="flex gap-4">
+            <Skeleton height={40} width={120} />
+            <Skeleton height={40} width={120} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-500 mb-2">Product not found</h2>
+          <p className="text-gray-600">The product you're looking for doesn't exist.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-green-50 py-12 px-4 md:px-20">

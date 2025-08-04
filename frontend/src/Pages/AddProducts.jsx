@@ -3,9 +3,12 @@ import axios from 'axios';
 import './AddProducts.css';
 import { useNavigate } from 'react-router-dom';
 import 'remixicon/fonts/remixicon.css';
+import { API_ENDPOINTS } from '../config/api';
+import toast from 'react-hot-toast';
 
 const AddProducts = () => {
   const navigate = useNavigate();
+<<<<<<< HEAD
 
   const [title, setTitle] = useState('');
   const [imageFile, setImageFile] = useState(null);
@@ -55,6 +58,46 @@ const AddProducts = () => {
         err.response?.data?.message ||
           'Failed to add product. Check console / network and backend logs.'
       );
+=======
+  const [title, settitle] = useState('');
+  const [image, setimage] = useState('');
+  const [description, setdescription] = useState('');
+  const [category, setcategory] = useState('');
+  const [price, setprice] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (loading) return; // Prevent multiple submissions
+    
+    setLoading(true);
+    const loadingToast = toast.loading('Adding product...');
+    
+    try {
+      let formData = new FormData(e.target);
+      const res = await axios.post(`${API_ENDPOINTS.PRODUCTS}/add`, formData);
+      
+      toast.dismiss(loadingToast);
+      toast.success('Product added successfully!');
+      
+      // Reset form
+      settitle('');
+      setimage('');
+      setdescription('');
+      setcategory('');
+      setprice('');
+      
+      // Navigate after a short delay to show the success message
+      setTimeout(() => {
+        navigate('/admin');
+      }, 1500);
+      
+    } catch (err) {
+      console.log(err);
+      toast.dismiss(loadingToast);
+      toast.error('Failed to add product. Please try again.');
+>>>>>>> de4b59a23ddacd56210fff56c7d215d7980bf8e9
     } finally {
       setLoading(false);
     }
@@ -76,6 +119,7 @@ const AddProducts = () => {
             name="title"
             id="title"
             required
+            disabled={loading}
           />
         </div>
 
@@ -88,6 +132,7 @@ const AddProducts = () => {
             accept="image/*"
             onChange={(e) => setImageFile(e.target.files[0])}
             required
+            disabled={loading}
           />
         </div>
 
@@ -101,6 +146,7 @@ const AddProducts = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            disabled={loading}
           ></textarea>
         </div>
 
@@ -114,6 +160,7 @@ const AddProducts = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
 
@@ -127,6 +174,7 @@ const AddProducts = () => {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
+<<<<<<< HEAD
             min="0"
             step="0.01"
           />
@@ -138,6 +186,20 @@ const AddProducts = () => {
           {loading ? (
             <>
               <i className="ri-loader-4-line ri-spin"></i> Submitting...
+=======
+            disabled={loading}
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          className="submitBtn"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <i className="ri-loader-4-line animate-spin"></i> Adding Product...
+>>>>>>> de4b59a23ddacd56210fff56c7d215d7980bf8e9
             </>
           ) : (
             <>
