@@ -2,160 +2,97 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './AddProducts.css';
 import { useNavigate } from 'react-router-dom';
-import 'remixicon/fonts/remixicon.css';
-import { API_ENDPOINTS } from '../config/api';
-import toast from 'react-hot-toast';
 
 const AddProducts = () => {
-  const navigate = useNavigate();
 
-  // State variables (camelCase)
-  const [title, setTitle] = useState('');
-  const [image, setImage] = useState(null);
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [price, setPrice] = useState('');
-  const [loading, setLoading] = useState(false);
+    const navigate = useNavigate()
+    const [title, settitle] = useState('');
+    const [image, setimage] = useState('');
+    const [description, setdescription] = useState('');
+    const [category, setcategory] = useState('');
+    const [price, setprice] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        let formData = new FormData(e.target);
+        axios.post("https://e-commerce-react-backend-mhf8.onrender.com/products/add", formData)
+            .then((res) => {
+                console.log(res);
+                navigate("/admin")
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
-    if (loading) return; // Prevent multiple submissions
+    return (
+        <div
+          
+        className='formContainer'>
+            <form onSubmit={handleSubmit}>
+                <div className="formGroup">
+                    <label htmlFor="title">Title</label>
+                    <input
+                        type="text"
+                        placeholder="Enter product title"
+                        value={title}
+                        onChange={(e) => settitle(e.target.value)}
+                        name="title"
+                        id="title"
+                    />
+                </div>
 
-    setLoading(true);
-    const loadingToast = toast.loading('Adding product...');
+                <div className="formGroup">
+                    <label htmlFor="image">Image</label>
+                    <input
+                        type="file"
+                        name="image"
+                        id="image"
+                        accept="image/*"
+                        onChange={(e) => setimage(e.target.files[0])}
+                    />
+                </div>
 
-    try {
-      let formData = new FormData();
-      formData.append('title', title);
-      formData.append('image', image);
-      formData.append('description', description);
-      formData.append('category', category);
-      formData.append('price', price);
+                <div className="formGroup">
+                    <label htmlFor="description">Description</label>
+                    <input
+                        type="text"
+                        placeholder="Enter product description"
+                        name="description"
+                        id="description"
+                        value={description}
+                        onChange={(e) => setdescription(e.target.value)}
+                    />
+                </div>
 
-      const res = await axios.post(`${API_ENDPOINTS.PRODUCTS}/add`, formData);
+                <div className="formGroup">
+                    <label htmlFor="category">Category</label>
+                    <input
+                        type="text"
+                        placeholder="Enter product category"
+                        name="category"
+                        id="category"
+                        value={category}
+                        onChange={(e) => setcategory(e.target.value)}
+                    />
+                </div>
 
-      toast.dismiss(loadingToast);
-      toast.success('Product added successfully!');
+                <div className="formGroup">
+                    <label htmlFor="price">Price</label>
+                    <input
+                        type="number"
+                        placeholder="Enter product price"
+                        name="price"
+                        id="price"
+                        value={price}
+                        onChange={(e) => setprice(e.target.value)}
+                    />
+                </div>
 
-      // Reset form
-      setTitle('');
-      setImage(null);
-      setDescription('');
-      setCategory('');
-      setPrice('');
-
-      // Navigate after short delay
-      setTimeout(() => {
-        navigate('/admin');
-      }, 1500);
-
-    } catch (err) {
-      console.log(err);
-      toast.dismiss(loadingToast);
-      toast.error('Failed to add product. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="formContainer">
-      <h2>
-        <i className="ri-plant-line"></i> Add New Product
-      </h2>
-      <form 
-        onSubmit={handleSubmit} 
-        className="productForm" 
-        encType="multipart/form-data"
-      >
-        <div className="formGroup">
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            placeholder="Enter product title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            name="title"
-            id="title"
-            required
-            disabled={loading}
-          />
+                <button type="submit">Submit</button>
+            </form>
         </div>
-
-        <div className="formGroup">
-          <label htmlFor="image">Image</label>
-          <input
-            type="file"
-            name="image"
-            id="image"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <div className="formGroup">
-          <label htmlFor="description">Description</label>
-          <textarea
-            placeholder="Enter product description"
-            name="description"
-            id="description"
-            rows="3"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            disabled={loading}
-          ></textarea>
-        </div>
-
-        <div className="formGroup">
-          <label htmlFor="category">Category</label>
-          <input
-            type="text"
-            placeholder="Enter product category"
-            name="category"
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <div className="formGroup">
-          <label htmlFor="price">Price (₹)</label>
-          <input
-            type="number"
-            placeholder="Enter product price"
-            name="price"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <button 
-          type="submit" 
-          className="submitBtn"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <i className="ri-loader-4-line animate-spin"></i> Adding Product...
-            </>
-          ) : (
-            <>
-              <i className="ri-upload-cloud-2-line"></i> Submit Product
-            </>
-          )}
-        </button>
-      </form>
-    </div>
-  );
+    );
 };
 
 export default AddProducts;
