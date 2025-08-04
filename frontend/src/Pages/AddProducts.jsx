@@ -3,13 +3,11 @@ import axios from 'axios';
 import './AddProducts.css';
 import { useNavigate } from 'react-router-dom';
 import 'remixicon/fonts/remixicon.css';
-import { API_ENDPOINTS } from '../config/api';
 import toast from 'react-hot-toast';
 
 const AddProducts = () => {
   const navigate = useNavigate();
 
-  // State variables (camelCase)
   const [title, setTitle] = useState('');
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState('');
@@ -19,41 +17,54 @@ const AddProducts = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
 
-    if (loading) return; // Prevent multiple submissions
+    if (!image) {
+      toast.error('Please select an image.');
+      return;
+    }
 
     setLoading(true);
     const loadingToast = toast.loading('Adding product...');
 
     try {
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append('title', title);
-      formData.append('image', image);
+      formData.append('image', image); // backend expects field name "image"
       formData.append('description', description);
       formData.append('category', category);
       formData.append('price', price);
 
-      const res = await axios.post(`${API_ENDPOINTS.PRODUCTS}/add`, formData);
+      const res = await axios.post(
+        'https://plant-web-backend.onrender.com/products/add',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
       toast.dismiss(loadingToast);
       toast.success('Product added successfully!');
 
-      // Reset form
+      // reset form
       setTitle('');
       setImage(null);
       setDescription('');
       setCategory('');
       setPrice('');
 
-      // Navigate after short delay
-      setTimeout(() => {
-        navigate('/admin');
-      }, 1500);
-
+      // navigate back to admin list
+      setTimeout(() => navigate('/admin'), 1000);
     } catch (err) {
-      console.log(err);
+      console.error('Submit error:', err);
       toast.dismiss(loadingToast);
-      toast.error('Failed to add product. Please try again.');
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to add product. Check backend logs.';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -64,9 +75,9 @@ const AddProducts = () => {
       <h2>
         <i className="ri-plant-line"></i> Add New Product
       </h2>
-      <form 
-        onSubmit={handleSubmit} 
-        className="productForm" 
+      <form
+        onSubmit={handleSubmit}
+        className="productForm"
         encType="multipart/form-data"
       >
         <div className="formGroup">
@@ -135,14 +146,12 @@ const AddProducts = () => {
             onChange={(e) => setPrice(e.target.value)}
             required
             disabled={loading}
+            min="0"
+            step="0.01"
           />
         </div>
 
-        <button 
-          type="submit" 
-          className="submitBtn"
-          disabled={loading}
-        >
+        <button type="submit" className="submitBtn" disabled={loading}>
           {loading ? (
             <>
               <i className="ri-loader-4-line animate-spin"></i> Adding Product...
@@ -159,3 +168,4 @@ const AddProducts = () => {
 };
 
 export default AddProducts;
+
