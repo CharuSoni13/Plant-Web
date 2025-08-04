@@ -15,7 +15,7 @@ const AddProducts = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         let formData = new FormData(e.target);
-        axios.post("https://e-commerce-react-backend-mhf8.onrender.com/products/add", formData)
+        axios.post("https://plant-web-backend.onrender.com/products/add", formData)
             .then((res) => {
                 console.log(res);
                 navigate("/admin")
