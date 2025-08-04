@@ -2,125 +2,127 @@ const express = require("express");
 const productModel = require("../models/product.model");
 const ImageKit = require("imagekit");
 const multer = require("multer");
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const router = express.Router();
 
-
-
-router.get("/", (req, res) => {
- 
-});
-
-
-
-router.post("/add", upload.single("image"), async (req, res) => {
-
-  const imagekit = new ImageKit({
+// Helper to initialize ImageKit
+function getImageKit() {
+  if (!process.env.PUBLIC_KEY || !process.env.PRIVATE_KEY || !process.env.URLENDPOINT) {
+    throw new Error("ImageKit credentials are missing in environment variables.");
+  }
+  return new ImageKit({
     publicKey: process.env.PUBLIC_KEY,
-    privateKey :process.env.PRIVATE_KEY ,
-    urlEndpoint:process.env.URLENDPOINT ,
+    privateKey: process.env.PRIVATE_KEY,
+    urlEndpoint: process.env.URLENDPOINT,
   });
-  // const imagekit = new ImageKit({
-  //   publicKey: "public_YgYC4GDAhVw4ZlFbjBCAxBblIrs=",
-  //   privateKey : "private_Eeu0A85aohXDzsIRvNGjmevvrqw=",
-  //   urlEndpoint: "https://ik.imagekit.io/charusoni",
-  // });
+}
 
-
-  const result = await imagekit.upload({
-    file : req.file.buffer,
-    fileName : req.file.originalname,
-    isPrivateFile : false,
-    isPublished : true
-  })
-
-  const imageUrl = result.url
-
- 
-  const { title, description, category, price } = req.body;
-  
-
-      const product = new productModel(
-          {
-              title : title,
-              description : description,
-              category : category,
-              price : price,
-              image : imageUrl
-           }
-  )
-
-      await product.save()
-
-  res.json({message : "data aaya"})
+// Get all products
+router.get("/", async (req, res) => {
+  try {
+    const products = await productModel.find();
+    res.status(200).json(products);
+  } catch (err) {
+    console.error("Error fetching products:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-router.get("/:id",async (req, res)=>{
-    const productId = req.params.id
+// Add new product
+router.post("/add", upload.single("image"), async (req, res) => {
+  try {
+    const imagekit = getImageKit();
 
-    const product = await productModel.findById(productId)
+    let imageUrl = "";
+    if (req.file) {
+      const result = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        isPrivateFile: false,
+        isPublished: true,
+      });
+      imageUrl = result.url;
+    }
 
-    console.log(product);
+    const { title, description, category, price } = req.body;
+    if (!title || !description || !category || !price) {
+      return res.status(400).json({ error: "Please fill all required fields." });
+    }
 
+    const product = new productModel({
+      title,
+      description,
+      category,
+      price,
+      image: imageUrl,
+    });
 
-    res.status(200).json({message : "data mil gya " , product})
-    
-})
+    await product.save();
+    res.status(201).json({ message: "Product added successfully", product });
+  } catch (error) {
+    console.error("Error adding product:", error);
+    res.status(500).json({ error: "Internal Server Error", details: error.message });
+  }
+});
 
-router.get("/update/:id", async(req, res)=>{
+// Get product by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const product = await productModel.findById(productId);
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
-    const productId = req.params.id
+    res.status(200).json({ message: "Product fetched successfully", product });
+  } catch (err) {
+    console.error("Error fetching product:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
-    const product = await productModel.findById(productId)
+// Update product
+router.post("/update/:id", upload.single("image"), async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { title, description, category, price } = req.body;
 
+    const updateData = { title, description, category, price };
 
-    res.render("updateForm",{product : product})
-})
+    if (req.file) {
+      const imagekit = getImageKit();
+      const result = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        isPrivateFile: false,
+        isPublished: true,
+      });
+      updateData.image = result.url;
+    }
 
+    const updatedProduct = await productModel.findByIdAndUpdate(productId, updateData, { new: true });
 
-router.post("/update/:id",upload.single("image") ,async(req, res)=>{
+    if (!updatedProduct) return res.status(404).json({ error: "Product not found" });
 
-    const productId = req.params.id
+    res.status(200).json({ message: "Product updated successfully", product: updatedProduct });
+  } catch (err) {
+    console.error("Error updating product:", err);
+    res.status(500).json({ error: "Internal Server Error", details: err.message });
+  }
+});
 
-    console.log(req.body);
-    
-  const { title, description, category, price } = req.body;
+// Delete product
+router.get("/delete/:id", async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const deletedProduct = await productModel.findByIdAndDelete(productId);
+    if (!deletedProduct) return res.status(404).json({ error: "Product not found" });
 
-  
-  
-
-
-  const result = await imagekit.upload({
-    file : req.file.buffer,
-    fileName : req.file.originalname,
-    isPrivateFile : false,
-    isPublished : true
-  })
-
-  const imageUrl = result.url
-
-    await productModel.findByIdAndUpdate(productId,{
-    title : title,
-    description : description,
-    category : category,
-    price : price,
-    image : imageUrl
-  })
-
-  res.redirect(`/products/${productId}`)
-    
-})
-
-
-router.get("/delete/:id" , async (req,res)=>{
-    const productId = req.params.id
-
-    await productModel.findByIdAndDelete(productId)
-
-    res.redirect("/")
-})
-
-
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 module.exports = router;
