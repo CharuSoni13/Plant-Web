@@ -8,57 +8,6 @@ import toast from 'react-hot-toast';
 
 const AddProducts = () => {
   const navigate = useNavigate();
-<<<<<<< HEAD
-
-  const [title, setTitle] = useState('');
-  const [imageFile, setImageFile] = useState(null);
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [price, setPrice] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!imageFile) {
-      setError('Please select an image.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('image', imageFile); // must match backend multer field name
-      formData.append('description', description);
-      formData.append('category', category);
-      formData.append('price', price);
-
-      // If your backend requires any auth headers, include them here.
-      const res = await axios.post(
-        'https://plant-web-backend.onrender.com/products/add',
-        formData,
-        {
-          headers: {
-            // axios will normally set the proper multipart/form-data boundary automatically,
-            // but you can include this if your backend expects it explicitly.
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      console.log('Add product response:', res.data);
-      navigate('/admin');
-    } catch (err) {
-      console.error('Error submitting product:', err);
-      setError(
-        err.response?.data?.message ||
-          'Failed to add product. Check console / network and backend logs.'
-      );
-=======
   const [title, settitle] = useState('');
   const [image, setimage] = useState('');
   const [description, setdescription] = useState('');
@@ -97,7 +46,6 @@ const AddProducts = () => {
       console.log(err);
       toast.dismiss(loadingToast);
       toast.error('Failed to add product. Please try again.');
->>>>>>> de4b59a23ddacd56210fff56c7d215d7980bf8e9
     } finally {
       setLoading(false);
     }
@@ -174,19 +122,6 @@ const AddProducts = () => {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
-<<<<<<< HEAD
-            min="0"
-            step="0.01"
-          />
-        </div>
-
-        {error && <div className="errorMsg">{error}</div>}
-
-        <button type="submit" className="submitBtn" disabled={loading}>
-          {loading ? (
-            <>
-              <i className="ri-loader-4-line ri-spin"></i> Submitting...
-=======
             disabled={loading}
           />
         </div>
@@ -199,7 +134,6 @@ const AddProducts = () => {
           {loading ? (
             <>
               <i className="ri-loader-4-line animate-spin"></i> Adding Product...
->>>>>>> de4b59a23ddacd56210fff56c7d215d7980bf8e9
             </>
           ) : (
             <>
