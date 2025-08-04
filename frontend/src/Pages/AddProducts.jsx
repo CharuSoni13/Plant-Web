@@ -3,6 +3,8 @@ import axios from 'axios';
 import './AddProducts.css';
 import { useNavigate } from 'react-router-dom';
 import 'remixicon/fonts/remixicon.css';
+import { API_ENDPOINTS } from '../config/api';
+import toast from 'react-hot-toast';
 
 const AddProducts = () => {
   const navigate = useNavigate();
@@ -11,19 +13,42 @@ const AddProducts = () => {
   const [description, setdescription] = useState('');
   const [category, setcategory] = useState('');
   const [price, setprice] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let formData = new FormData(e.target);
-    axios
-      .post('https://plant-web-backend.onrender.com/products/add', formData)
-      .then((res) => {
-        console.log(res);
+    
+    if (loading) return; // Prevent multiple submissions
+    
+    setLoading(true);
+    const loadingToast = toast.loading('Adding product...');
+    
+    try {
+      let formData = new FormData(e.target);
+      const res = await axios.post(`${API_ENDPOINTS.PRODUCTS}/add`, formData);
+      
+      toast.dismiss(loadingToast);
+      toast.success('Product added successfully!');
+      
+      // Reset form
+      settitle('');
+      setimage('');
+      setdescription('');
+      setcategory('');
+      setprice('');
+      
+      // Navigate after a short delay to show the success message
+      setTimeout(() => {
         navigate('/admin');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      }, 1500);
+      
+    } catch (err) {
+      console.log(err);
+      toast.dismiss(loadingToast);
+      toast.error('Failed to add product. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,6 +65,7 @@ const AddProducts = () => {
             name="title"
             id="title"
             required
+            disabled={loading}
           />
         </div>
 
@@ -52,6 +78,7 @@ const AddProducts = () => {
             accept="image/*"
             onChange={(e) => setimage(e.target.files[0])}
             required
+            disabled={loading}
           />
         </div>
 
@@ -65,6 +92,7 @@ const AddProducts = () => {
             value={description}
             onChange={(e) => setdescription(e.target.value)}
             required
+            disabled={loading}
           ></textarea>
         </div>
 
@@ -78,6 +106,7 @@ const AddProducts = () => {
             value={category}
             onChange={(e) => setcategory(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
 
@@ -91,11 +120,24 @@ const AddProducts = () => {
             value={price}
             onChange={(e) => setprice(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
 
-        <button type="submit" className="submitBtn">
-          <i className="ri-upload-cloud-2-line"></i> Submit Product
+        <button 
+          type="submit" 
+          className="submitBtn"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <i className="ri-loader-4-line animate-spin"></i> Adding Product...
+            </>
+          ) : (
+            <>
+              <i className="ri-upload-cloud-2-line"></i> Submit Product
+            </>
+          )}
         </button>
       </form>
     </div>

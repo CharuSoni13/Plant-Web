@@ -4,78 +4,152 @@ const userModel = require("../models/user.model")
 
 const router = express.Router()
 
-router.post("/register",async (req, res)=>{
-
-    const {username , email , password} = req.body
+// Google Sign-In endpoint
+router.post("/google-signin", async (req, res) => {
+    const { uid, email, displayName, providerId } = req.body
 
     try {
-      
-        if(!username){
-            return res.status(400).json({message : "username is required"})
+        if (!uid || !email) {
+            return res.status(400).json({ message: "UID and email are required" })
         }
-        if(!email){
-            return res.status(400).json({message : "email is required"})
-        }
-        if(!password){
-            return res.status(400).json({message : "password is required"})
-        }
-       
 
-        const hashedPass = await bcrypt.hash(password ,10)
+        // Check if user already exists
+        let user = await userModel.findOne({ uid: uid })
 
-        const user = new userModel({
-            username : username,
-            email : email ,
-            password : hashedPass
+        if (user) {
+            // Update last login
+            user.lastLogin = new Date()
+            await user.save()
+            
+            return res.status(200).json({
+                message: "Login successful",
+                user: {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.username,
+                    providerId: user.providerId,
+                    role: user.role,
+                    isActive: user.isActive
+                }
+            })
+        }
+
+        // Create new user with default role as 'user'
+        const newUser = new userModel({
+            uid: uid,
+            username: displayName || email.split('@')[0],
+            email: email,
+            providerId: providerId || 'google.com',
+            isGoogleUser: true,
+            role: 'user' // Default role for new users
         })
 
-
-        await user.save()
+        await newUser.save()
         
-        res.send("register successfully....")
+        res.status(201).json({
+            message: "User created successfully",
+            user: {
+                uid: newUser.uid,
+                email: newUser.email,
+                displayName: newUser.username,
+                providerId: newUser.providerId,
+                role: newUser.role,
+                isActive: newUser.isActive
+            }
+        })
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({message : "internal server error", error : error.message})
+        console.log(error)
+        res.status(500).json({ message: "Internal server error", error: error.message })
     }
-
 })
 
+// Get user profile
+router.get("/profile/:uid", async (req, res) => {
+    try {
+        const user = await userModel.findOne({ uid: req.params.uid })
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
 
-router.post("/login", async (req, res)=>{
-    const {email , password} = req.body
+        res.status(200).json({
+            user: {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.username,
+                providerId: user.providerId,
+                isGoogleUser: user.isGoogleUser,
+                role: user.role,
+                isActive: user.isActive,
+                createdAt: user.createdAt,
+                lastLogin: user.lastLogin
+            }
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: "internal server error", error: error.message })
+    }
+})
+
+// Update user role (admin only)
+router.patch("/update-role/:uid", async (req, res) => {
+    const { role } = req.body
 
     try {
-
-
-        if(!email){
-            return res.status(400).json({message : "email is required"})
-        }
-        if(!password){
-            return res.status(400).json({message : "password is required"})
+        if (!role || !['user', 'admin'].includes(role)) {
+            return res.status(400).json({ message: "Valid role (user/admin) is required" })
         }
 
-        const user = await userModel.findOne({email : email})
-
-        if(!user){
-            return res.status(400).json({message : "user not exists"})
+        const user = await userModel.findOne({ uid: req.params.uid })
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
         }
 
-        const isTrue = await bcrypt.compare(password ,user.password )
+        user.role = role
+        await user.save()
 
-
-        if(!isTrue){
-            return res.status(400).json({message : "email or password desnot match"})
-        }
-
-        res.status(200).json({message : "login successfully..."})
+        res.status(200).json({
+            message: "User role updated successfully",
+            user: {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.username,
+                role: user.role
+            }
+        })
 
     } catch (error) {
-        console.log(error); 
-        res.status(500).json({message : "internal server error", error : error.message})
-    
+        console.log(error)
+        res.status(500).json({ message: "internal server error", error: error.message })
     }
 })
 
+// Get all users (admin only)
+router.get("/all", async (req, res) => {
+    try {
+        const users = await userModel.find({}).sort({ createdAt: -1 })
+        
+        res.status(200).json({
+            users: users.map(user => ({
+                uid: user.uid,
+                email: user.email,
+                displayName: user.username,
+                providerId: user.providerId,
+                isGoogleUser: user.isGoogleUser,
+                role: user.role,
+                isActive: user.isActive,
+                createdAt: user.createdAt,
+                lastLogin: user.lastLogin
+            }))
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: "internal server error", error: error.message })
+    }
+})
 
 module.exports = router

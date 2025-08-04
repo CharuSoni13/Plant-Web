@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'remixicon/fonts/remixicon.css';
 import './AddProducts.css';
+import { API_ENDPOINTS } from '../config/api';
+import toast from 'react-hot-toast';
 
 const UpdateProduct = () => {
   const { productId } = useParams();
@@ -13,41 +15,87 @@ const UpdateProduct = () => {
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
-    axios.get(`https://plant-web-backend.onrender.com/products/${productId}`)
-      .then(res => {
-        const prod = res.data.product;
-        setProduct(prod);
-        setTitle(prod.title);
-        setDescription(prod.description);
-        setCategory(prod.category);
-        setPrice(prod.price);
-      })
-      .catch(err => console.error(err));
+    getProduct();
   }, [productId]);
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('category', category);
-    formData.append('price', price);
-    if (imageFile) {
-      formData.append('image', imageFile);
-    }
-
+  const getProduct = async () => {
     try {
-      await axios.post(`https://plant-web-backend.onrender.com/products/update/${productId}`, formData);
-      alert('Product updated successfully!');
-      navigate('/admin');
+      setLoading(true);
+      const res = await axios.get(`${API_ENDPOINTS.PRODUCTS}/${productId}`);
+      const prod = res.data.product;
+      setProduct(prod);
+      setTitle(prod.title);
+      setDescription(prod.description);
+      setCategory(prod.category);
+      setPrice(prod.price);
     } catch (err) {
-      console.error('Failed to update product:', err);
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!product) return <p>Loading...</p>;
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    
+    if (updating) return; // Prevent multiple submissions
+    
+    setUpdating(true);
+    const loadingToast = toast.loading('Updating product...');
+    
+    try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('category', category);
+      formData.append('price', price);
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
+
+      await axios.post(`${API_ENDPOINTS.PRODUCTS}/update/${productId}`, formData);
+      
+      toast.dismiss(loadingToast);
+      toast.success('Product updated successfully!');
+      
+      // Navigate after a short delay to show the success message
+      setTimeout(() => {
+        navigate('/admin');
+      }, 1500);
+      
+    } catch (err) {
+      console.error('Failed to update product:', err);
+      toast.dismiss(loadingToast);
+      toast.error('Failed to update product. Please try again.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="formContainer">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading product details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="formContainer">
+        <div className="text-center">
+          <p className="text-red-600">Product not found.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="formContainer">
@@ -62,6 +110,7 @@ const UpdateProduct = () => {
             name="title"
             id="title"
             required
+            disabled={updating}
           />
         </div>
 
@@ -73,6 +122,7 @@ const UpdateProduct = () => {
             id="image"
             accept="image/*"
             onChange={(e) => setImageFile(e.target.files[0])}
+            disabled={updating}
           />
         </div>
 
@@ -85,6 +135,7 @@ const UpdateProduct = () => {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            disabled={updating}
           ></textarea>
         </div>
 
@@ -97,6 +148,7 @@ const UpdateProduct = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             required
+            disabled={updating}
           />
         </div>
 
@@ -109,11 +161,24 @@ const UpdateProduct = () => {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
+            disabled={updating}
           />
         </div>
 
-        <button type="submit" className="submitBtn">
-          <i className="ri-upload-2-line"></i> Update Product
+        <button 
+          type="submit" 
+          className="submitBtn"
+          disabled={updating}
+        >
+          {updating ? (
+            <>
+              <i className="ri-loader-4-line animate-spin"></i> Updating Product...
+            </>
+          ) : (
+            <>
+              <i className="ri-upload-2-line"></i> Update Product
+            </>
+          )}
         </button>
       </form>
     </div>
