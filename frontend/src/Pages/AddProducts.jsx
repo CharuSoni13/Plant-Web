@@ -8,40 +8,48 @@ import toast from 'react-hot-toast';
 
 const AddProducts = () => {
   const navigate = useNavigate();
-  const [title, settitle] = useState('');
-  const [image, setimage] = useState('');
-  const [description, setdescription] = useState('');
-  const [category, setcategory] = useState('');
-  const [price, setprice] = useState('');
+
+  // State variables (camelCase)
+  const [title, setTitle] = useState('');
+  const [image, setImage] = useState(null);
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
+  const [price, setPrice] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (loading) return; // Prevent multiple submissions
-    
+
     setLoading(true);
     const loadingToast = toast.loading('Adding product...');
-    
+
     try {
-      let formData = new FormData(e.target);
+      let formData = new FormData();
+      formData.append('title', title);
+      formData.append('image', image);
+      formData.append('description', description);
+      formData.append('category', category);
+      formData.append('price', price);
+
       const res = await axios.post(`${API_ENDPOINTS.PRODUCTS}/add`, formData);
-      
+
       toast.dismiss(loadingToast);
       toast.success('Product added successfully!');
-      
+
       // Reset form
-      settitle('');
-      setimage('');
-      setdescription('');
-      setcategory('');
-      setprice('');
-      
-      // Navigate after a short delay to show the success message
+      setTitle('');
+      setImage(null);
+      setDescription('');
+      setCategory('');
+      setPrice('');
+
+      // Navigate after short delay
       setTimeout(() => {
         navigate('/admin');
       }, 1500);
-      
+
     } catch (err) {
       console.log(err);
       toast.dismiss(loadingToast);
@@ -56,7 +64,11 @@ const AddProducts = () => {
       <h2>
         <i className="ri-plant-line"></i> Add New Product
       </h2>
-      <form onSubmit={handleSubmit} className="productForm" encType="multipart/form-data">
+      <form 
+        onSubmit={handleSubmit} 
+        className="productForm" 
+        encType="multipart/form-data"
+      >
         <div className="formGroup">
           <label htmlFor="title">Title</label>
           <input
@@ -78,7 +90,7 @@ const AddProducts = () => {
             name="image"
             id="image"
             accept="image/*"
-            onChange={(e) => setImageFile(e.target.files[0])}
+            onChange={(e) => setImage(e.target.files[0])}
             required
             disabled={loading}
           />
