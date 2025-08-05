@@ -16,11 +16,11 @@ router.get("/", (req, res) => {
 
 router.post("/add", upload.single("image"), async (req, res) => {
 
-  // const imagekit = new ImageKit({
-  //   publicKey: "public_YgYC4GDAhVw4ZlFbjBCAxBblIrs=",
-  //   privateKey : "private_Eeu0A85aohXDzsIRvNGjmevvrqw=",
-  //   urlEndpoint: "https://ik.imagekit.io/charusoni",
-  // });
+  const imagekit = new ImageKit({
+    publicKey: process.env.PUBLIC_KEY,
+    privateKey :process.env.PRIVATE_KEY ,
+    urlEndpoint:process.env.URLENDPOINT ,
+  });
 
 
   const result = await imagekit.upload({
