@@ -10,7 +10,13 @@ const cors = require("cors");
 require("dotenv").config();
 app.use(morgon("dev"));
 
-app.use(cors({ origin: ["https://plant-web-frontend.onrender.com", "http://localhost:5174"] }));
+app.use(cors({
+  origin: ["https://plant-web-frontend.onrender.com", "http://localhost:5174"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+app.options("*", cors());
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
