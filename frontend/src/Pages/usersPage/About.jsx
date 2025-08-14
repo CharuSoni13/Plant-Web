@@ -1,9 +1,15 @@
 import React from 'react';
-import aboutImg from '../../assets/plant-about.jpg';
-// Add a plant-themed image in this path
+import aboutImg from '../../assets/aboutimg.jpg';
 import 'remixicon/fonts/remixicon.css';
+import { useNavigate } from 'react-router-dom'; // <-- Import navigation
 
 const About = () => {
+  const navigate = useNavigate(); // <-- Initialize navigate
+
+  const handleExploreClick = () => {
+    navigate('/'); // <-- Redirect to homepage
+  };
+
   return (
     <div className="min-h-screen bg-green-50 py-12 px-4 md:px-20 font-sans text-gray-800">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
@@ -18,7 +24,9 @@ const About = () => {
 
         {/* Text Content */}
         <div>
-          <h1 className="text-4xl font-bold text-green-700 mb-4">About <span className="text-green-500">Green Roots</span></h1>
+          <h1 className="text-4xl font-bold text-green-700 mb-4">
+            About <span className="text-green-500">Green Roots</span>
+          </h1>
           <p className="mb-4 leading-relaxed">
             Welcome to <strong>Green Roots</strong> — your one-stop destination for a wide variety of indoor, outdoor, flowering, and exotic plants. 🌿
           </p>
@@ -32,7 +40,10 @@ const About = () => {
           <p className="mb-4 leading-relaxed">
             <i className="ri-plant-line text-green-600"></i> Join our growing community of plant lovers and turn your space into a sanctuary of life and calm.
           </p>
-          <button className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow-md transition">
+          <button
+            onClick={handleExploreClick}
+            className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow-md transition"
+          >
             Explore Our Plants
           </button>
         </div>

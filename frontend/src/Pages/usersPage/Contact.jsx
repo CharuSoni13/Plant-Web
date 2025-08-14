@@ -1,133 +1,78 @@
-import React, { useState } from "react";
-import "remixicon/fonts/remixicon.css";
+import React, { useState } from 'react';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: ""
+    name: '',
+    email: '',
+    message: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus(null);
-
-    try {
-      // Just console log the form data
-      console.log("📧 Contact Form Submission:");
-      console.log("Name:", formData.name);
-      console.log("Email:", formData.email);
-      console.log("Message:", formData.message);
-      console.log("Timestamp:", new Date().toISOString());
-
-      // Show success message
-      setSubmitStatus({
-        success: true,
-        message: "Thank you! Your message has been received. We'll get back to you soon!"
-      });
-      setFormData({ name: "", email: "", message: "" });
-      
-    } catch (error) {
-      console.error('Error processing form:', error);
-      setSubmitStatus({
-        success: false,
-        message: "Something went wrong. Please try again."
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div className="min-h-screen bg-green-50 px-6 py-12 flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-green-800 mb-6">🌱 Contact Us</h1>
+    <div className="min-h-screen bg-[#f6f9f4] flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-lg bg-white rounded-2xl shadow-lg border border-[#d0e2d0] p-8">
+        <h2 className="text-3xl font-bold text-[#2f5d50] mb-6 text-center">
+          🌱 Get in Touch
+        </h2>
 
-      <p className="text-gray-700 max-w-xl text-center mb-10">
-        Have questions, suggestions, or just want to say hi? Reach out and we’ll
-        get back to you as soon as possible!
-      </p>
-
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-8 w-full max-w-xl space-y-6">
-        {submitStatus && (
-          <div className={`p-4 rounded-lg ${
-            submitStatus.success 
-              ? 'bg-green-100 text-green-800 border border-green-200' 
-              : 'bg-red-100 text-red-800 border border-red-200'
-          }`}>
-            {submitStatus.message}
-          </div>
-        )}
-        
-        <div>
-          <label className="block text-gray-700 font-semibold mb-1">Your Name</label>
+        <form
+          action="https://formspree.io/f/mvgqvaoj" // <-- Replace with your actual Formspree ID
+          method="POST"
+        >
+          {/* Name */}
+          <label className="block text-[#4a6f5c] text-sm font-semibold mb-2">
+            Name
+          </label>
           <input
+            className="w-full px-4 py-2 mb-4 rounded-lg border border-[#b4d6b4] bg-[#f9fff9] text-[#2f5d50] placeholder-[#8aa88a] focus:outline-none focus:ring-2 focus:ring-[#7bc47f]"
             type="text"
             name="name"
+            placeholder="Your name"
             value={formData.name}
-            onChange={handleInputChange}
-            className="w-full border border-gray-300 rounded px-4 py-2 outline-none focus:ring-2 focus:ring-green-400"
-            placeholder="Enter your name"
+            onChange={handleChange}
             required
           />
-        </div>
 
-        <div>
-          <label className="block text-gray-700 font-semibold mb-1">Email Address</label>
+          {/* Email */}
+          <label className="block text-[#4a6f5c] text-sm font-semibold mb-2">
+            Email
+          </label>
           <input
+            className="w-full px-4 py-2 mb-4 rounded-lg border border-[#b4d6b4] bg-[#f9fff9] text-[#2f5d50] placeholder-[#8aa88a] focus:outline-none focus:ring-2 focus:ring-[#7bc47f]"
             type="email"
             name="email"
+            placeholder="Your email"
             value={formData.email}
-            onChange={handleInputChange}
-            className="w-full border border-gray-300 rounded px-4 py-2 outline-none focus:ring-2 focus:ring-green-400"
-            placeholder="you@example.com"
+            onChange={handleChange}
             required
           />
-        </div>
 
-        <div>
-          <label className="block text-gray-700 font-semibold mb-1">Message</label>
+          {/* Message */}
+          <label className="block text-[#4a6f5c] text-sm font-semibold mb-2">
+            Message
+          </label>
           <textarea
+            className="w-full px-4 py-2 mb-6 rounded-lg border border-[#b4d6b4] bg-[#f9fff9] text-[#2f5d50] placeholder-[#8aa88a] focus:outline-none focus:ring-2 focus:ring-[#7bc47f]"
             name="message"
+            rows="5"
+            placeholder="Your message"
             value={formData.message}
-            onChange={handleInputChange}
-            rows="4"
-            className="w-full border border-gray-300 rounded px-4 py-2 outline-none focus:ring-2 focus:ring-green-400"
-            placeholder="Write your message here..."
+            onChange={handleChange}
             required
-          ></textarea>
-        </div>
+          />
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`px-6 py-2 rounded transition ${
-            isSubmitting 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-green-700 hover:bg-green-800'
-          } text-white`}
-        >
-          {isSubmitting ? (
-            <>
-              <i className="ri-loader-4-line mr-2 animate-spin"></i> Sending...
-            </>
-          ) : (
-            <>
-              <i className="ri-mail-send-line mr-2"></i> Send Message
-            </>
-          )}
-        </button>
-      </form>
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full py-3 px-4 bg-[#7bc47f] hover:bg-[#6ab06e] text-white font-bold rounded-lg shadow-md transition duration-300"
+          >
+            Send Message
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
