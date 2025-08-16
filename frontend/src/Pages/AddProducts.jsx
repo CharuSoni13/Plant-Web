@@ -3,6 +3,7 @@ import axios from "axios";
 import "./AddProducts.css";
 import { useNavigate } from "react-router-dom";
 import "remixicon/fonts/remixicon.css";
+import { API_ENDPOINTS } from "../config/api";
 
 const AddProducts = () => {
   const navigate = useNavigate();
@@ -29,12 +30,12 @@ const AddProducts = () => {
       // const res = await axios.post(
       //   // "http://localhost:3000/products/add",
       //   "https://plant-web-backend.onrender.com/products/add",
-        // formData,
-        const API_BASE = "https://plant-web-backend.onrender.com";
-        const res = await axios.post(`${API_BASE}/products/add`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-        
+      // formData,
+      // const API_BASE = "https://plant-web-backend.onrender.com";
+      const res = await axios.post(`${API_ENDPOINTS.PRODUCTS}/add`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       console.log("Product Added:", res.data);
       navigate("/admin"); // redirect to admin dashboard
     } catch (err) {
@@ -121,6 +122,3 @@ const AddProducts = () => {
 };
 
 export default AddProducts;
-
-
-

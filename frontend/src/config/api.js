@@ -4,7 +4,7 @@ export const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'https://plant-w
 // API endpoints
 export const API_ENDPOINTS = {
   BASE: API_BASE_URL,
-  PRODUCTS: `${API_BASE_URL}/product`,
+  PRODUCTS: `${API_BASE_URL}/products`,
   USERS: `${API_BASE_URL}/user`,
   AUTH: `${API_BASE_URL}/user`,
 }; 
