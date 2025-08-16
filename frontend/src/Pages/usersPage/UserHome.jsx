@@ -12,7 +12,19 @@ const UserHome = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getData();
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.getaxios.get(API_ENDPOINTS.BASE); 
+        // 👆 this should match your backend route for fetching all products
+        setProductData(res.data); 
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const getData = async () => {

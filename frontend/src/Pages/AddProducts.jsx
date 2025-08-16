@@ -1,34 +1,53 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import './AddProducts.css';
-import { useNavigate } from 'react-router-dom';
-import 'remixicon/fonts/remixicon.css';
+import React, { useState } from "react";
+import axios from "axios";
+import "./AddProducts.css";
+import { useNavigate } from "react-router-dom";
+import "remixicon/fonts/remixicon.css";
 
 const AddProducts = () => {
   const navigate = useNavigate();
-  const [title, settitle] = useState('');
-  const [image, setimage] = useState('');
-  const [description, setdescription] = useState('');
-  const [category, setcategory] = useState('');
-  const [price, setprice] = useState('');
+  const [title, settitle] = useState("");
+  const [image, setimage] = useState(null);
+  const [description, setdescription] = useState("");
+  const [category, setcategory] = useState("");
+  const [price, setprice] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let formData = new FormData(e.target);
-    axios
-      .post('https://plant-web-backend.onrender.com/product/add', formData)
-      .then((res) => {
-        console.log(res);
-        navigate('/admin');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
+    // build formData manually
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("price", price);
+    if (image) {
+      formData.append("image", image);
+    }
+
+    try {
+      const res = await axios.post(
+        // "http://localhost:3000/products/add",
+        "https://plant-web-backend.onrender.com/products/add",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Product Added:", res.data);
+      navigate("/admin"); // redirect to admin dashboard
+    } catch (err) {
+      console.error("Error adding product:", err);
+    }
   };
 
   return (
     <div className="formContainer">
-      <h2><i className="ri-plant-line"></i> Add New Product</h2>
+      <h2>
+        <i className="ri-plant-line"></i> Add New Product
+      </h2>
       <form onSubmit={handleSubmit} className="productForm">
         <div className="formGroup">
           <label htmlFor="title">Title</label>
