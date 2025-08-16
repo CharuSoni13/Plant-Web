@@ -11,36 +11,37 @@ const UserHome = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const res = await axios.getaxios.get(API_ENDPOINTS.BASE); 
+  //       // 👆 this should match your backend route for fetching all products
+  //       setProductData(res.data); 
+  //       setLoading(false);
+  //     } catch (err) {
+  //       console.error("Error fetching products:", err);
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchProducts();
+  // }, []);
+
   useEffect(() => {
-    const fetchProducts = async () => {
+      getData();
+    }, []);
+
+  const getData = async () => {
       try {
-        const res = await axios.getaxios.get(API_ENDPOINTS.BASE); 
-        // 👆 this should match your backend route for fetching all products
-        setProductData(res.data); 
-        setLoading(false);
+        setLoading(true);
+        const res = await axios.get(API_ENDPOINTS.BASE);
+        setProductData(res.data.products);
       } catch (err) {
         console.error("Error fetching products:", err);
+      } finally {
         setLoading(false);
       }
     };
-
-    fetchProducts();
-  }, []);
-
-  const getData = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(API_ENDPOINTS.PRODUCTS);
-
-      setProductData(res.data);
-
-    } catch (err) {
-      console.error("Failed to fetch products:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Loading skeleton component
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
