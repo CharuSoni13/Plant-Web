@@ -26,16 +26,15 @@ const AddProducts = () => {
     }
 
     try {
-      const res = await axios.post(
-        // "http://localhost:3000/products/add",
-        "https://plant-web-backend.onrender.com/products/add",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      // const res = await axios.post(
+      //   // "http://localhost:3000/products/add",
+      //   "https://plant-web-backend.onrender.com/products/add",
+        // formData,
+        const API_BASE = "https://plant-web-backend.onrender.com";
+        const res = await axios.post(`${API_BASE}/products/add`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+        
       console.log("Product Added:", res.data);
       navigate("/admin"); // redirect to admin dashboard
     } catch (err) {
