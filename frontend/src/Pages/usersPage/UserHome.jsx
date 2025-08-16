@@ -30,8 +30,10 @@ const UserHome = () => {
   const getData = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(API_ENDPOINTS.BASE);
-      setProductData(res.data.products);
+      const res = await axios.get(API_ENDPOINTS.PRODUCTS);
+
+      setProductData(res.data);
+
     } catch (err) {
       console.error("Failed to fetch products:", err);
     } finally {
