@@ -15,7 +15,7 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/auth/all');
+      const response = await fetch('https://plant-web-backend.onrender.com/api/auth/all');
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
 
   const updateUserRole = async (uid, newRole) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/auth/update-role/${uid}`, {
+      const response = await fetch(`https://plant-web-backend.onrender.com/api/auth/update-role/${uid}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
