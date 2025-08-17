@@ -5,6 +5,7 @@ import plantVideo from "../../assets/plant-video.mp4";
 import { API_ENDPOINTS } from "../../config/api"; 
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import Footer from "../../components/Footer";
 
 const UserHome = () => {
   const [productData, setProductData] = useState([]);
@@ -158,6 +159,7 @@ const UserHome = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

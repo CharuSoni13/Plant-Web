@@ -77,6 +77,11 @@ const UserProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-green-50 py-12 px-4 md:px-20">
+      {/* Heading */}
+      <h1 className="text-4xl font-bold text-green-800 text-center mb-10 flex items-center justify-center gap-2">
+        🌱 Plant Details
+      </h1>
+
       <div className="bg-white rounded-lg shadow-lg p-8 md:flex gap-10">
         {/* Product Image */}
         <div className="md:w-1/2 mb-6 md:mb-0 flex justify-center items-center">
@@ -124,5 +129,3 @@ const UserProductDetail = () => {
 };
 
 export default UserProductDetail;
-
-

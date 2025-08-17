@@ -31,10 +31,10 @@ const ProductDetail = () => {
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        const loadingToast = toast.loading('Deleting product...');
+        const loadingToast = toast.loading("Deleting product...");
         await axios.get(`${API_ENDPOINTS.PRODUCTS}/delete/${productId}`);
         toast.dismiss(loadingToast);
-        toast.success('Product deleted successfully!');
+        toast.success("Product deleted successfully!");
         navigate("/admin");
       } catch (err) {
         toast.error("Failed to delete product.");
@@ -83,6 +83,12 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 md:px-20">
+      {/* Heading */}
+      <h1 className="text-4xl font-bold text-green-800 text-center mb-10 flex items-center justify-center gap-2">
+        🌱 Plant Details
+      </h1>
+
+      {/* Product Card */}
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Product Image */}

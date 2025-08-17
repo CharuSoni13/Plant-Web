@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { API_ENDPOINTS } from "../config/api";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import Footer from "../components/Footer";
 
 const Home = () => {
   const [productData, setProductData] = useState([]);
@@ -77,6 +78,7 @@ const Home = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };
